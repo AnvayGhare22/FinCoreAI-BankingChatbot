@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tata Capital | Agentic AI Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* --- PREMIUM FINTECH VARIABLES --- */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: rgba(30, 41, 59, 0.85);
+            --primary: #3b82f6;
+            --accent: #f59e0b; /* Gold */
+            --success: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 80px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; align-items: center;
+            padding-top: 2rem; gap: 2rem; z-index: 100;
+        }
+        .nav-icon {
+            width: 50px; height: 50px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); font-size: 1.2rem; transition: 0.3s; cursor: pointer;
+        }
+        .nav-icon:hover, .nav-icon.active {
+            background: rgba(59, 130, 246, 0.2); color: var(--primary);
+        }
+
+        /* --- MAIN LAYOUT --- */
+        .main-content {
+            flex: 1; display: grid; grid-template-columns: 1fr 400px;
+            gap: 20px; padding: 20px; max-width: 1600px; margin: 0 auto;
+            height: 100vh; box-sizing: border-box;
+        }
+
+        /* --- INTERACTION ZONE (LEFT) --- */
+        .interaction-zone {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif; font-size: 3.5rem; margin: 0;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .mic-orb {
+            width: 130px; height: 130px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.2), rgba(0,0,0,0));
+            border: 2px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: 0.4s; position: relative;
+        }
+        .mic-orb:hover { transform: scale(1.05); border-color: var(--primary); }
+        .mic-orb.listening { animation: pulse 1.5s infinite; border-color: var(--accent); }
+        .mic-orb i { font-size: 2.5rem; color: var(--text-main); }
+        
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 70% { box-shadow: 0 0 0 30px transparent; } }
+
+        .btn-glass {
+            margin-top: 40px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border); color: var(--text-main);
+            padding: 12px 25px; border-radius: 30px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; font-weight: 600;
+        }
+        .btn-glass.active { background: var(--accent); color: black; border-color: var(--accent); }
+
+        /* --- AGENT HUD (RIGHT - FIXED SCROLLING) --- */
+        .agent-hud {
+            background: var(--bg-panel); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            padding: 20px; 
+            display: flex; flex-direction: column; 
+            gap: 15px;
+            height: 95%; /* Fit within container */
+            align-self: center;
+            overflow: hidden; /* Prevent parent scroll */
+        }
+        
+        .hud-header {
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--text-muted); padding-bottom: 10px; border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+            display: flex; justify-content: space-between;
+        }
+
+        /* SCROLLABLE CARD AREA */
+        .agents-list {
+            flex-grow: 1; /* Takes available space */
+            overflow-y: auto;
+            display: flex; flex-direction: column; gap: 10px;
+            padding-right: 5px; /* Space for scrollbar */
+        }
+
+        .agent-card {
+            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 12px;
+            display: flex; align-items: center; gap: 15px; opacity: 0.4; transition: 0.4s;
+            flex-shrink: 0; /* Prevent squishing */
+        }
+        .agent-card.active { opacity: 1; background: rgba(59, 130, 246, 0.15); border-left: 4px solid var(--primary); }
+        .agent-icon {
+            width: 35px; height: 35px; border-radius: 8px; background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* TRANSCRIPT & SECURITY LOG AREAS */
+        .info-panel {
+            flex-shrink: 0; /* Don't shrink these */
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .transcript-box {
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px;
+            font-size: 0.9rem; color: #e2e8f0; 
+            height: 100px; /* Fixed height for transcript */
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+        }
+        
+        /* UEBA SECURITY LOG PANEL */
+        .ueba-panel {
+            background: #000; padding: 15px; border-radius: 12px;
+            font-family: 'Courier New', monospace; font-size: 0.75rem; color: var(--success);
+            border: 1px solid #1e293b;
+            height: 80px; /* Fixed height for logs */
+            overflow-y: auto;
+        }
+        .ueba-title { color: #64748b; margin-bottom: 5px; font-weight: bold; font-size: 0.7rem; border-bottom: 1px solid #333; padding-bottom: 5px;}
+        .log-entry { margin-bottom: 3px; border-left: 2px solid transparent; padding-left: 5px; }
+        .log-entry.new { border-left-color: var(--success); animation: flash 1s; }
+
+        @keyframes flash { 0% { background: rgba(16, 185, 129, 0.2); } 100% { background: transparent; } }
+
+        /* HIDDEN CAMERA */
+        #camera-preview { 
+            position: fixed; bottom: 20px; left: 100px; width: 220px; 
+            border: 2px solid var(--accent); border-radius: 12px; display: none; z-index: 50;
+        }
+        #snapshot-canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="nav-icon" style="color:var(--accent); font-size:1.5rem;" onclick="location.reload()"><i class="fa-solid fa-infinity"></i></div>
+        <div class="nav-icon active" onclick="resetUI()"><i class="fa-solid fa-house"></i></div>
+        <div class="nav-icon" title="Loans" onclick="triggerAction('I want to apply for a personal loan.', 'agent-sales')"><i class="fa-solid fa-wallet"></i></div>
+        <div class="nav-icon" title="Insurance" onclick="triggerAction('Show me insurance plans.', 'agent-sales')"><i class="fa-solid fa-shield-halved"></i></div>
+        <a href="login.html" class="nav-icon" style="margin-top:auto; margin-bottom:20px; text-decoration:none;"><i class="fa-solid fa-power-off"></i></a>
+    </div>
+
+    <div class="main-content">
+        <div class="interaction-zone">
+            <div class="hero-text" style="text-align:center; margin-bottom:30px;">
+                <h1>FinCore AI</h1>
+                <p style="color:var(--accent); letter-spacing:2px; font-weight:700;">AGENTIC ORCHESTRATION SUITE</p>
+            </div>
+
+            <div class="mic-orb" id="mic-btn" onmousedown="startListening()" onmouseup="stopListening()">
+                <i class="fa-solid fa-microphone"></i>
+            </div>
+            <p style="margin-top:20px; color:var(--text-muted); font-size:0.8rem;">HOLD SPACE OR CLICK TO SPEAK</p>
+
+            <button class="btn-glass" id="vision-btn" onclick="toggleCamera()">
+                <i class="fa-solid fa-id-card"></i> Enable KYC Vision
+            </button>
+        </div>
+
+        <div class="agent-hud">
+            <div class="hud-header">
+                <span>Active Agents</span> <span style="color:var(--success)">● SYSTEM ONLINE</span>
+            </div>
+
+            <div class="agents-list">
+                <div class="agent-card active" id="agent-master">
+                    <div class="agent-icon"><i class="fa-solid fa-brain"></i></div>
+                    <div><h4>Master Agent</h4><p style="margin:0; font-size:0.7rem;">Orchestrator</p></div>
+                </div>
+
+                <div class="agent-card" id="agent-sales">
+                    <div class="agent-icon"><i class="fa-solid fa-comments-dollar"></i></div>
+                    <div><h4>Sales Agent</h4><p style="margin:0; font-size:0.7rem;">Products & Rates</p></div>
+                </div>
+
+                <div class="agent-card" id="agent-verify">
+                    <div class="agent-icon"><i class="fa-solid fa-eye"></i></div>
+                    <div><h4>Verification Agent</h4><p style="margin:0; font-size:0.7rem;">Vision KYC</p></div>
+                </div>
+
+                <div class="agent-card" id="agent-risk">
+                    <div class="agent-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <div><h4>Underwriting Agent</h4><p style="margin:0; font-size:0.7rem;">Risk Analysis</p></div>
+                </div>
+
+                <div class="agent-card" id="agent-doc">
+                    <div class="agent-icon"><i class="fa-solid fa-file-contract"></i></div>
+                    <div><h4>Sanction Agent</h4><p style="margin:0; font-size:0.7rem;">PDF Generation</p></div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="transcript-box" id="transcript-text">
+                    Waiting for user input...
+                </div>
+
+                <div class="ueba-panel" id="ueba-box">
+                    <div class="ueba-title"><i class="fa-solid fa-terminal"></i> UEBA SECURITY LOG</div>
+                    <div id="ueba-log-content">
+                        <div class="log-entry">> Initializing Security Protocol... [OK]</div>
+                        <div class="log-entry">> User Authenticated. IP: 192.168.1.105</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <video id="camera-preview" autoplay playsinline></video>
+    <canvas id="snapshot-canvas"></canvas>
+
+    <script>
+        // --- VARIABLES ---
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isCameraOn = false;
+        let isRecording = false; // CRITICAL FLAG TO FIX LOOPING
+
+        // --- 1. QUICK ACTION (Navbar) ---
+        function triggerAction(text, agentId) {
+            highlightAgent(agentId);
+            document.getElementById('transcript-text').innerHTML = `<span style="color:var(--accent)">[COMMAND]:</span> ${text}`;
+            const formData = new FormData();
+            formData.append("text_input", text);
+            sendToBackend(formData);
+        }
+
+        // --- 2. CAMERA TOGGLE ---
+        async function toggleCamera() {
+            const video = document.getElementById('camera-preview');
+            const btn = document.getElementById('vision-btn');
+            
+            if(!isCameraOn) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    btn.classList.add('active');
+                    btn.innerHTML = '<i class="fa-solid fa-camera"></i> Vision Active';
+                    isCameraOn = true;
+                } catch(e) { alert("Camera Permission Denied"); }
+            } else {
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(t => t.stop());
+                }
+                video.style.display = 'none';
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fa-solid fa-id-card"></i> Enable KYC Vision';
+                isCameraOn = false;
+            }
+        }
+
+        // --- 3. VOICE LOGIC (FIXED) ---
+        async function startListening() {
+            // STOP MULTIPLE TRIGGERS (Key Repeat Fix)
+            if (isRecording) return;
+            isRecording = true;
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                
+                // Use WebM for Chrome/Firefox compatibility
+                const options = { mimeType: 'audio/webm' };
+                mediaRecorder = new MediaRecorder(stream, options);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks, {type: 'audio/webm'});
+                    
+                    // Filter out empty/short audio (prevents 110-byte error)
+                    if (blob.size < 500) {
+                        console.warn("Audio too short, ignoring.");
+                        document.getElementById('transcript-text').innerText = "Please speak clearly.";
+                        resetMicUI();
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append("audio_data", blob, "recording.webm");
+
+                    if(isCameraOn) {
+                        const video = document.getElementById('camera-preview');
+                        const canvas = document.getElementById('snapshot-canvas');
+                        canvas.width = video.videoWidth; 
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        canvas.toBlob(imgBlob => {
+                            formData.append("image_data", imgBlob, "kyc.jpg");
+                            sendToBackend(formData);
+                        }, 'image/jpeg');
+                    } else {
+                        sendToBackend(formData);
+                    }
+                };
+
+                mediaRecorder.start();
+                document.getElementById('mic-btn').classList.add('listening');
+                document.getElementById('transcript-text').innerText = "Listening...";
+                
+            } catch(e) {
+                console.error(e);
+                alert("Mic Error: " + e.message);
+                isRecording = false; // Reset flag on error
+            }
+        }
+
+        function stopListening() {
+            if (!mediaRecorder || mediaRecorder.state === "inactive") return;
+            
+            mediaRecorder.stop();
+            // Stop tracks to release mic
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            
+            resetMicUI();
+        }
+
+        function resetMicUI() {
+            document.getElementById('mic-btn').classList.remove('listening');
+            isRecording = false; // Allow next recording
+        }
+
+        // --- 4. BACKEND COMMUNICATION ---
+        function sendToBackend(formData) {
+            document.getElementById('transcript-text').innerText = "Orchestrating Agents...";
+            
+            fetch('/process_audio', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('transcript-text').innerText = data.user_text || data.ai_text;
+                
+                if(data.active_agent) highlightAgent(data.active_agent);
+                if(data.audio_base64) {
+                    const audio = new Audio("data:audio/mp3;base64," + data.audio_base64);
+                    audio.play();
+                }
+                
+                // UEBA Log
+                if(data.ueba_log) {
+                    const logContainer = document.getElementById('ueba-log-content');
+                    const time = new Date().toLocaleTimeString([], {hour12:false});
+                    logContainer.innerHTML += `<div class="log-entry new">> [${time}] ${data.ueba_log}</div>`;
+                    const box = document.getElementById('ueba-box');
+                    box.scrollTop = box.scrollHeight;
+                }
+
+                // PDF Download Link
+                if(data.pdf_url) {
+                    // Check if button already exists to prevent duplicates
+                    if(!document.getElementById('btn-download-pdf')) {
+                        const link = document.createElement('a');
+                        link.id = 'btn-download-pdf';
+                        link.href = data.pdf_url;
+                        link.className = 'btn-glass';
+                        link.style.cssText = "background:var(--success); margin-top:10px; text-decoration:none; justify-content:center; color:white;";
+                        link.innerHTML = '<i class="fa-solid fa-download"></i> Download Sanction Letter';
+                        document.querySelector('.info-panel').appendChild(link); // Append to panel, not transcript box
+                    }
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                document.getElementById('transcript-text').innerText = "System Error. Please try again.";
+            });
+        }
+
+        // --- UI HELPERS ---
+        function highlightAgent(id) {
+            document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+            const t = document.getElementById(id);
+            if(t) {
+                t.classList.add('active');
+                t.scrollIntoView({behavior: "smooth", block: "nearest"});
+            }
+        }
+        
+        function resetUI() {
+            highlightAgent('agent-master');
+            document.getElementById('transcript-text').innerText = "System Ready.";
+        }
+        
+        // --- KEYBOARD LISTENERS ---
+        document.addEventListener('keydown', e => { 
+            if(e.code === 'Space' && !e.repeat) { // Ignore auto-repeat events
+                e.preventDefault(); // Prevent scrolling
+                startListening(); 
+            }
+        });
+        
+        document.addEventListener('keyup', e => { 
+            if(e.code === 'Space') {
+                e.preventDefault(); 
+                stopListening(); 
+            }
+        });
+    </script>
+</body>
+</html>
